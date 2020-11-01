@@ -68,6 +68,7 @@
                     this.todos = data.data;
                   });
                 });
+              this.new_todo_text = "";
             } else {
               axios
                 .put(`/api/todos/${this.editing}`, { text: this.new_todo_text })
