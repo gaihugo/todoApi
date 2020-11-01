@@ -24,11 +24,16 @@
           placeholder="O que você precisa fazer?"
           v-model="new_todo_text"
         />
-        <button @click="newTodo">Enviar</button>
+        <button @click="newTodo">
+          <span v-if="editing == -1">Adicionar</span>
+          <span v-else>Atualizar</span>
+        </button>
       </div>
       <button @click="update">Atualizar lista</button>
       <ul class="bg-gray-100">
-        <li v-for="todo in todos">{{todo.name}}</li>
+        <li v-for="todo in todos">
+          {{todo.name}} <button @click="edit(todo.id)">Editar</button>
+        </li>
       </ul>
     </div>
     <script>
@@ -38,6 +43,7 @@
           return {
             todos: "",
             new_todo_text: "",
+            editing: -1, // -1 para adicionar, id para mudar
           };
         },
         mounted() {
@@ -52,15 +58,34 @@
             });
           },
           newTodo() {
-            axios
-              .post("/api/todos", { text: this.new_todo_text })
-              .then((data) => {
-                console.log(data);
-                //
-                axios.get("/api/todos").then((data) => {
-                  this.todos = data.data;
+            if (this.editing == -1) {
+              axios
+                .post("/api/todos", { text: this.new_todo_text })
+                .then((data) => {
+                  console.log(data);
+                  //
+                  axios.get("/api/todos").then((data) => {
+                    this.todos = data.data;
+                  });
                 });
-              });
+            } else {
+              axios
+                .put(`/api/todos/${this.editing}`, { text: this.new_todo_text })
+                .then((data) => {
+                  console.log(data);
+                  //
+                  axios.get("/api/todos").then((data) => {
+                    this.todos = data.data;
+                  });
+                });
+              // Reseta para o modo de adição
+              this.new_todo_text = "";
+              this.editing = -1;
+            }
+          },
+          edit(id) {
+            this.editing = id;
+            this.new_todo_text = this.todos.find((todo) => todo.id == id).name;
           },
         },
       });

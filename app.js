@@ -39,6 +39,14 @@ app.get("/api/todos/:id/", (req, res) => {
 });
 
 // PUT /api/todos/5 => edita a todo
+app.put("/api/todos/:id/", (req, res) => {
+  // req.params.id
+  var todo = todos.find((todo) => todo.id == req.params.id);
+  todo.name = req.body.text || todo.name;
+  todo.completed = req.body.completed;
+
+  res.json({ status: "Success" });
+});
 
 // DELETE /api/todos/5 => Apaga a Todo 5
 
