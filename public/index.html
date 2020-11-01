@@ -33,6 +33,7 @@
       <ul class="bg-gray-100">
         <li v-for="todo in todos">
           {{todo.name}} <button @click="edit(todo.id)">Editar</button>
+          <button @click="apagar(todo.id)">Delete</button>
         </li>
       </ul>
     </div>
@@ -62,7 +63,6 @@
               axios
                 .post("/api/todos", { text: this.new_todo_text })
                 .then((data) => {
-                  console.log(data);
                   //
                   axios.get("/api/todos").then((data) => {
                     this.todos = data.data;
@@ -72,7 +72,6 @@
               axios
                 .put(`/api/todos/${this.editing}`, { text: this.new_todo_text })
                 .then((data) => {
-                  console.log(data);
                   //
                   axios.get("/api/todos").then((data) => {
                     this.todos = data.data;
@@ -86,6 +85,14 @@
           edit(id) {
             this.editing = id;
             this.new_todo_text = this.todos.find((todo) => todo.id == id).name;
+          },
+          apagar(id) {
+            axios.delete(`/api/todos/${id}`).then((data) => {
+              //
+              axios.get("/api/todos").then((data) => {
+                this.todos = data.data;
+              });
+            });
           },
         },
       });

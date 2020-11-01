@@ -49,5 +49,16 @@ app.put("/api/todos/:id/", (req, res) => {
 });
 
 // DELETE /api/todos/5 => Apaga a Todo 5
+app.delete("/api/todos/:id/", (req, res) => {
+  var index = todos.findIndex((todo) => todo.id == req.params.id);
+
+  if (index == -1) {
+    return res.json({ status: "Not found" });
+  }
+
+  todos.splice(index, 1);
+
+  res.json({ status: "Success" });
+});
 
 app.listen(port);
