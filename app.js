@@ -22,18 +22,24 @@ function Todo(name, completed) {
 var todos = [Todo("Comprar Peixe", false), Todo("Comprar Carne", true)];
 
 // GET /api/todos => lista de todas as Todos
-app.get("/api/todos", (req, res) => {
+app.get("/api/todos/", (req, res) => {
   res.json(todos);
 });
 
 // POST /api/todos => cria uma nova todo
-app.post("/api/todos", (req, res) => {
+app.post("/api/todos/", (req, res) => {
   todos.push(Todo(req.body.text, false));
   res.json({ status: "Success" });
 });
 
 // GET /api/todos/5 => exibe detalhes da Todo
+app.get("/api/todos/:id/", (req, res) => {
+  // req.params.id
+  res.json(todos.find((todo) => todo.id == req.params.id));
+});
+
 // PUT /api/todos/5 => edita a todo
+
 // DELETE /api/todos/5 => Apaga a Todo 5
 
 app.listen(port);
