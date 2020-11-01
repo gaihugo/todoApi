@@ -16,6 +16,17 @@
       <h1 class="text-2xl">Api para tarefas</h1>
 
       Para acessar a api acesse o enderço com <code>/api</code> na url!
+
+      <div>
+        <input
+          type="text"
+          name="text"
+          placeholder="O que você precisa fazer?"
+          v-model="new_todo_text"
+        />
+        <button @click="newTodo">Enviar</button>
+      </div>
+      <button @click="update">Atualizar lista</button>
       <ul class="bg-gray-100">
         <li v-for="todo in todos">{{todo.name}}</li>
       </ul>
@@ -26,12 +37,31 @@
         data() {
           return {
             todos: "",
+            new_todo_text: "",
           };
         },
         mounted() {
           axios.get("/api/todos").then((data) => {
             this.todos = data.data;
           });
+        },
+        methods: {
+          update() {
+            axios.get("/api/todos").then((data) => {
+              this.todos = data.data;
+            });
+          },
+          newTodo() {
+            axios
+              .post("/api/todos", { text: this.new_todo_text })
+              .then((data) => {
+                console.log(data);
+                //
+                axios.get("/api/todos").then((data) => {
+                  this.todos = data.data;
+                });
+              });
+          },
         },
       });
     </script>
