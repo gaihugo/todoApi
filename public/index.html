@@ -32,8 +32,8 @@
       <button @click="update">Atualizar lista</button>
       <ul class="bg-gray-100">
         <li v-for="todo in todos">
-          {{todo.name}} <button @click="edit(todo.id)">Editar</button>
-          <button @click="apagar(todo.id)">Delete</button>
+          {{todo.name}} <button @click="edit(todo._id)">Editar</button>
+          <button @click="apagar(todo._id)">Delete</button>
         </li>
       </ul>
     </div>
@@ -85,7 +85,7 @@
           },
           edit(id) {
             this.editing = id;
-            this.new_todo_text = this.todos.find((todo) => todo.id == id).name;
+            this.new_todo_text = this.todos.find((todo) => todo._id == id).name;
           },
           apagar(id) {
             axios.delete(`/api/todos/${id}`).then((data) => {

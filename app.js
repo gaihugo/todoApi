@@ -3,60 +3,70 @@ const express = require("express");
 const bodyParser = require("body-parser"); //Pega o body num formato json legivel para js
 const app = express();
 const port = 3000;
+const mongoose = require("mongoose");
+require("dotenv/config");
 
 app.use(morgan("dev"));
 
 app.use(express.static("public"));
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var indice_atual = 0;
+mongoose
+  .connect(process.env.CONECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("OK!!"))
+  .catch((e) => console.error("ERROR", e));
 
-function Todo(name, completed) {
-  var id = indice_atual;
-  indice_atual++;
-  return { id, name, completed };
-}
-
-var todos = [Todo("Comprar Peixe", false), Todo("Comprar Carne", true)];
+const Todo = mongoose.model("Todo", {
+  name: String,
+  completed: Boolean,
+});
 
 // GET /api/todos => lista de todas as Todos
 app.get("/api/todos/", (req, res) => {
-  res.json(todos);
+  Todo.find({}).then((todos) => res.json(todos));
 });
 
 // POST /api/todos => cria uma nova todo
 app.post("/api/todos/", (req, res) => {
-  todos.push(Todo(req.body.text, false));
-  res.json({ status: "Success" });
+  const todo = new Todo({
+    name: req.body.text,
+    completed: false,
+  });
+  todo.save().then(() => {
+    res.json({ status: "Success" });
+  });
 });
 
 // GET /api/todos/5 => exibe detalhes da Todo
 app.get("/api/todos/:id/", (req, res) => {
   // req.params.id
-  res.json(todos.find((todo) => todo.id == req.params.id));
+  Todo.findById(req.params.id).then((todo) => {
+    res.json(todo);
+  });
 });
 
 // PUT /api/todos/5 => edita a todo
 app.put("/api/todos/:id/", (req, res) => {
   // req.params.id
-  var todo = todos.find((todo) => todo.id == req.params.id);
-  todo.name = req.body.text || todo.name;
-  todo.completed = req.body.completed;
-
-  res.json({ status: "Success" });
+  Todo.findById(req.params.id).then((todo) => {
+    todo.name = req.body.text || todo.name;
+    todo.completed = req.body.completed;
+    todo
+      .save()
+      .then(() => {
+        res.json({ status: "Success" });
+      })
+      .catch((e) => console.error(e));
+  });
 });
 
 // DELETE /api/todos/5 => Apaga a Todo 5
-app.delete("/api/todos/:id/", (req, res) => {
-  var index = todos.findIndex((todo) => todo.id == req.params.id);
-
-  if (index == -1) {
-    return res.json({ status: "Not found" });
-  }
-
-  todos.splice(index, 1);
+app.delete("/api/todos/:id/", async (req, res) => {
+  await Todo.deleteOne({ _id: req.params.id });
 
   res.json({ status: "Success" });
 });
