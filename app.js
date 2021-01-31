@@ -25,6 +25,13 @@ const Todo = mongoose.model("Todo", {
   completed: Boolean,
 });
 
+const User = mongoose.model("User", {
+  username: String,
+  passwordHash: String,
+  passwordSalt: String,
+  email: String,
+});
+
 // GET /api/todos => lista de todas as Todos
 app.get("/api/todos/", (req, res) => {
   Todo.find({}).then((todos) => res.json(todos));
