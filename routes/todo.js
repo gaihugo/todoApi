@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-require("dotenv/config");
+const Todo = require("../models/Todo")
 
-const Todo = mongoose.model("Todo", {
-  name: String,
-  completed: Boolean,
-});
+
+
 
 // GET /api/todos => lista de todas as Todos
 router.get("/", (req, res) => {
@@ -22,7 +19,7 @@ router.post("/", (req, res) => {
   todo.save().then(() => {
     res.json({ status: "Success" });
   });
-});
+})
 
 // GET /api/todos/5 => exibe detalhes da Todo
 router.get("/:id/", (req, res) => {
@@ -54,7 +51,6 @@ router.delete("/:id/", async (req, res) => {
   res.json({ status: "Success" });
 });
 
-module.exports = {
-  todoRouter: router,
-  Todo,
-};
+module.exports = router
+
+

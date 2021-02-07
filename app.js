@@ -5,7 +5,9 @@ const app = express();
 const port = 3000;
 const mongoose = require("mongoose");
 require("dotenv/config");
-const { todoRouter, Todo } = require("./todo");
+
+const todoRouter = require("./routes/todo");
+const userRouter = require("./routes/user");
 
 app.use(morgan("dev"));
 
@@ -23,14 +25,9 @@ mongoose
   .then(() => console.log("OK!!"))
   .catch((e) => console.error("ERROR", e));
 
-const User = mongoose.model("User", {
-  username: String,
-  passwordHash: String,
-  passwordSalt: String,
-  email: String,
-});
-
 // Rotas
 app.use("/api/todos", todoRouter);
+app.use("/api/users", userRouter);
 
+// Inicia o servidor
 app.listen(port);
