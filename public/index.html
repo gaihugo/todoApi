@@ -4,41 +4,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Api para tarefas</title>
+    <style>
+      #content {
+        background-image: url("peter-vanosdall-ktpyjH2h9xs-unsplash.jpg");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+    </style>
     <link
       href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.1.1/css/all.css"
+      integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ"
+      crossorigin="anonymous"
     />
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <div id="app">
-      <h1 class="text-2xl">Api para tarefas</h1>
-
-      Para acessar a api acesse o enderço com <code>/api</code> na url!
-      <div class="buttons">
-        <a href="./login.html" class="bg-green-300 px-3 py-1 rounded-full">Login</a>
+    <div id="app"  class="h-screen flex flex-col max-h-screen" >
+      <h1 class="text-2xl bg-red-800 text-white px-4 py-2"><i class="fas fa-clipboard-list m-2"></i>Lista de Tarefas</h1> 
+      <div class="flex flex-col md:flex-row flex-1">
+        <div id="head" class="w-full md:w-1/3 bg-gray-200 pt-2 pb-5">
+          <div class="mx-auto px-4">
+  
+            <div class="buttons flex w-max">
+              <a href="./login.html" class="bg-red-300 px-3 py-1 rounded-full">Login</a>
+              <button @click="update" class="px-3 py-1"><i class="fas fa-redo-alt text-red-800"></i></button>
+              
+            </div>
+            <hr class="my-2 border border-grey-900">
+            <div class="flex flex-col space-y-2">
+              <input
+                type="text"
+                name="text"
+                placeholder="O que você precisa fazer?"
+                class="bg-gray-100 border border-full px-3 py-1 rounded-full border-gray-800 hover:border-red-400 w-min shadow-md"
+                v-model="new_todo_text"
+              />
+              <button @click="newTodo" class="bg-red-800 text-white border border-full px-3 py-1 rounded-full border-red-800 hover:border-red-400 w-min shadow-md">
+                <span v-if="editing == -1">Adicionar</span>
+                <span v-else>Atualizar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <div id="content" class=" px-4 py-2 h-full flex-1">
+          <div class="container mx-auto overflow-auto max-h-full">
+            <ul class="space-y-4 h-full overscroll-contain">
+              <li v-for="todo in todos" class="bg-gray-200 rounded-full py-3 px-5">
+                
+                <span :class="{'line-through text-gray-700' : todo.completed}">
+                  <i v-if="todo.completed" class="far fa-check-square text-xl m-1"></i>
+                  <i v-else class="far fa-square text-xl m-1"></i>
+                  {{todo.name}}
+                </span>
+                
+                <button @click="edit(todo._id)"><i class="fas fa-pencil-alt text-red-800 m-2" ></i></button>
+                <button @click="apagar(todo._id)"><i class="fas fa-trash-alt text-red-800"></i></i></button>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div>
-        <input
-          type="text"
-          name="text"
-          placeholder="O que você precisa fazer?"
-          v-model="new_todo_text"
-        />
-        <button @click="newTodo">
-          <span v-if="editing == -1">Adicionar</span>
-          <span v-else>Atualizar</span>
-        </button>
       </div>
-      <button @click="update">Atualizar lista</button>
-      <ul class="bg-gray-100">
-        <li v-for="todo in todos">
-          {{todo.name}} <button @click="edit(todo._id)">Editar</button>
-          <button @click="apagar(todo._id)">Delete</button>
-        </li>
-      </ul>
-    </div>
     <script>
       var app = new Vue({
         el: "#app",
