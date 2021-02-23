@@ -12,6 +12,10 @@ router.get("/", (req, res) => {
 
 // POST /api/todos => cria uma nova todo
 router.post("/", (req, res) => {
+  if (!req.body.text){
+    res.json({ status: "Text is required" });
+    return
+  }
   const todo = new Todo({
     name: req.body.text,
     completed: false,
@@ -28,6 +32,17 @@ router.get("/:id/", (req, res) => {
     res.json(todo);
   });
 });
+
+// GET /api/todos/<id>/complete => completa a todo
+router.get("/:id/complete/", async (req,res) => {
+  var todo = await Todo.findById(req.params.id);
+  todo.completed = !todo.completed
+  todo.save().then(()=> {
+    res.json(todo)
+  })
+  .catch((e) => console.error(e));
+
+})
 
 // PUT /api/todos/5 => edita a todo
 router.put("/:id/", (req, res) => {

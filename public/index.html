@@ -27,15 +27,15 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
-    <div id="app"  class="h-screen flex flex-col max-h-screen" >
-      <h1 class="text-2xl bg-red-800 text-white px-4 py-2"><i class="fas fa-clipboard-list m-2"></i>Lista de Tarefas</h1> 
-      <div class="flex flex-col md:flex-row flex-1">
-        <div id="head" class="w-full md:w-1/3 bg-gray-200 pt-2 pb-5">
-          <div class="mx-auto px-4">
+    <div id="app"  class="flex flex-col h-screen" >
+      <h1 class="px-4 py-2 text-2xl text-white bg-red-800"><i class="m-2 fas fa-clipboard-list"></i>Lista de Tarefas</h1> 
+      <div class="flex flex-col flex-1 md:flex-row">
+        <div id="head" class="w-full pt-2 pb-5 bg-gray-200 md:w-1/3">
+          <div class="px-4 mx-auto">
   
-            <div class="buttons flex w-max">
-              <a href="./login.html" class="bg-red-300 px-3 py-1 rounded-full">Login</a>
-              <button @click="update" class="px-3 py-1"><i class="fas fa-redo-alt text-red-800"></i></button>
+            <div class="flex buttons w-max">
+              <a href="./login.html" class="px-3 py-1 bg-red-300 rounded-full">Login</a>
+              <button @click="update" class="px-3 py-1"><i class="text-red-800 fas fa-redo-alt"></i></button>
               
             </div>
             <hr class="my-2 border border-grey-900">
@@ -44,10 +44,10 @@
                 type="text"
                 name="text"
                 placeholder="O que você precisa fazer?"
-                class="bg-gray-100 border border-full px-3 py-1 rounded-full border-gray-800 hover:border-red-400 w-min shadow-md"
+                class="px-3 py-1 bg-gray-100 border border-gray-800 rounded-full shadow-md border-full hover:border-red-400 w-min"
                 v-model="new_todo_text"
               />
-              <button @click="newTodo" class="bg-red-800 text-white border border-full px-3 py-1 rounded-full border-red-800 hover:border-red-400 w-min shadow-md">
+              <button @click="newTodo" class="px-3 py-1 text-white bg-red-800 border border-red-800 rounded-full shadow-md border-full hover:border-red-400 w-min">
                 <span v-if="editing == -1">Adicionar</span>
                 <span v-else>Atualizar</span>
               </button>
@@ -55,19 +55,21 @@
           </div>
         </div>
   
-        <div id="content" class=" px-4 py-2 h-full flex-1">
-          <div class="container mx-auto overflow-auto max-h-full">
-            <ul class="space-y-4 h-full overscroll-contain">
-              <li v-for="todo in todos" class="bg-gray-200 rounded-full py-3 px-5">
+        <div id="content" class="flex flex-1 px-4 py-2 overflow-hidden">
+          <div class="flex-1 mx-auto overflow-x-hidden overflow-y-auto">
+            <ul class="space-y-4">
+              <li v-for="todo in todos" class="px-5 py-3 bg-gray-200 rounded-full">
                 
                 <span :class="{'line-through text-gray-700' : todo.completed}">
-                  <i v-if="todo.completed" class="far fa-check-square text-xl m-1"></i>
-                  <i v-else class="far fa-square text-xl m-1"></i>
+                  <button @click="complete(todo._id)">
+                    <i v-if="todo.completed" class="m-1 text-xl far fa-check-square"></i>
+                    <i v-else class="m-1 text-xl far fa-square"></i>
+                  </button>
                   {{todo.name}}
                 </span>
                 
-                <button @click="edit(todo._id)"><i class="fas fa-pencil-alt text-red-800 m-2" ></i></button>
-                <button @click="apagar(todo._id)"><i class="fas fa-trash-alt text-red-800"></i></i></button>
+                <button @click="edit(todo._id)"><i class="m-2 text-red-800 fas fa-pencil-alt" ></i></button>
+                <button @click="apagar(todo._id)"><i class="text-red-800 fas fa-trash-alt"></i></i></button>
               </li>
             </ul>
           </div>
@@ -82,9 +84,12 @@
             todos: "",
             new_todo_text: "",
             editing: -1, // -1 para adicionar, id para mudar
+            user: null,
           };
         },
         mounted() {
+          // TODO verificar se está logado
+
           axios.get("/api/todos").then((data) => {
             this.todos = data.data;
           });
@@ -132,6 +137,19 @@
               });
             });
           },
+          async complete(id) {
+            // Atualização visual
+            var todo = this.todos.find((todo) => todo._id == id)
+            todo.completed = !todo.completed;
+
+            // Salvar
+            await axios.get(`/api/todos/${id}/complete`)
+
+            //Atualizar
+            axios.get("/api/todos").then((data) => {
+                this.todos = data.data;
+            });
+          }
         },
       });
     </script>
